@@ -1,0 +1,9 @@
+Trade day: April 16th, 2015
+Standard: 10,572.33
+Roth IRA: 5500.02
+
+Merits based on April 15th, 2015:
+VTI 374.490914874
+TLT -126.236981014
+EEM 162.462176601
+VGSIX -224.998472618
