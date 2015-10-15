@@ -8,6 +8,9 @@ import load_assets
 # List of assets to include in backtest
 #asset_names = ['FDVLX', 'VUSTX', 'FEMKX', 'VGSIX'] # Mutual funds: Stock, bond, emerging market, reit
 asset_names = ['VTI', 'TLT', 'EEM', 'VGSIX'] # Index funds to replace above
+#asset_names = ['IWV', 'VGLT', 'VWO', 'VNQ'] # Alternative index funds
+
+#asset_names = ['VTSAX', 'VBLTX', 'VWO', 'VGSLX'] # Index funds that are through Ubiquity
 
 # Number of trade days to include when computing merit
 number_of_trade_days_for_computing_merit = 65
@@ -88,7 +91,7 @@ def compute_gain_between_two_days(asset, start_trade_day, end_trade_day, max_los
     |print_monthly_gain| as True will print the monthly gain.
     |threshold_to_use_cash_if_merits_under| is a number. If all asset merits are under this threshold, then just use cash for a gain of 1.0.
 '''
-def get_gain_between_trades(first_of_month, print_monthly_gain=False, threshold_to_use_cash_if_merits_under=float('-inf'), print_all_assets=False, allocate_by_merit=False):
+def get_gain_between_trades(first_of_month, print_monthly_gain=False, threshold_to_use_cash_if_merits_under=float('-inf'), print_all_assets=False, allocate_by_merit=False, include_inverse_assets=False):
     global assets
     global number_of_trade_days_for_computing_merit
     
@@ -111,10 +114,19 @@ def get_gain_between_trades(first_of_month, print_monthly_gain=False, threshold_
             return None
         else:
             gain = compute_gain_between_two_days(asset, first_trade_day_of_month, next_first_trade_day_of_month, max_loss_percentage_allowed=0.8)
+            
+            is_inverse = False
+            if include_inverse_assets:
+                if merit < 0:
+                    is_inverse = True
+                    merit = -1.0 * merit
+                    gain  = 2.0 - gain
+            
             asset_by_merit.append({
-                'merit': merit,
-                'class': asset,
-                'gain':  gain
+                'merit':      merit,
+                'class':      asset,
+                'gain':       gain,
+                'is_inverse': is_inverse
             })
 
     if print_all_assets:
@@ -149,6 +161,8 @@ def get_gain_between_trades(first_of_month, print_monthly_gain=False, threshold_
             base_asset_name = 'cash'
     
         if print_monthly_gain:
+            if asset_by_merit[0]['is_inverse']:
+                base_asset_name = 'i' + base_asset_name
             print '%d/%d,gain,%.2f,%s' % (first_trade_day_of_month.month, first_trade_day_of_month.year, gain, base_asset_name)
             
     return gain
@@ -205,7 +219,7 @@ def backtest_assets():
     print 'Total CAGR,,%.1f%%' % get_compound_annual_growth_rate(start_gain, end_gain, number_of_years)
 
 def compute_merit_of_assets_yesterday():
-    yesterday = datetime.strptime('2015-05-15', '%Y-%m-%d')
+    yesterday = datetime.strptime('2015-08-14', '%Y-%m-%d')
     for asset in assets:
         print asset.name, asset.get_merit(yesterday, number_of_trade_days_for_computing_merit)
 
