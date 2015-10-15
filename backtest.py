@@ -1,4 +1,4 @@
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from dateutil.relativedelta import relativedelta
 import math
 
@@ -219,7 +219,8 @@ def backtest_assets():
     print 'Total CAGR,,%.1f%%' % get_compound_annual_growth_rate(start_gain, end_gain, number_of_years)
 
 def compute_merit_of_assets_yesterday():
-    yesterday = datetime.strptime('2015-08-14', '%Y-%m-%d')
+    _yd = date.today() - timedelta(days=1)
+    yesterday = datetime.strptime('%s-%s-%s'%(_yd.year, _yd.month, _yd.day), '%Y-%m-%d')
     for asset in assets:
         print asset.name, asset.get_merit(yesterday, number_of_trade_days_for_computing_merit)
 
