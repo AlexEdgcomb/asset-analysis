@@ -221,7 +221,6 @@ def backtest_assets():
 def compute_merit_of_assets_yesterday():
     _yd = date.today() - timedelta(days=1)
     yesterday = datetime.strptime('%s-%s-%s'%(_yd.year, _yd.month, _yd.day), '%Y-%m-%d')
-    print yesterday
     for asset in assets:
         print asset.name, asset.get_merit(yesterday, number_of_trade_days_for_computing_merit)
 
